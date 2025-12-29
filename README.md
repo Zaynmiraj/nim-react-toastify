@@ -1,271 +1,55 @@
-# 🧩 nim-react-toastify
+# nim-react-toastify Instructions
 
-> ⚡ One-command global toast notification system for **React**, **Next.js**, and **React Native / Expo**.
+## Purpose
+`nim-react-toastify` is a one-command CLI that detects your React/Next.js/Expo stack, injects a `NotificationsProvider`, and wires you up to a ready-made toast system that ships across platforms.
 
-`nim-react-toastify` automatically sets up a modern, beautiful notification (toast) system in your project — **with a single command**.  
-It detects your stack type (React, Next.js, or React Native), finds your app’s root file, injects a global `<NotificationsProvider>`, and creates a ready-to-use hook.
-
----
-
-## 🚀 Features
-
-- ✅ **Automatic stack detection** (`react`, `react-native`, or `nextjs`)
-- 🔍 **Auto-locates root file** (`App.tsx`, `src/App.tsx`, `app/layout.tsx`, `app/_layout.tsx`, etc.)
-- 🧠 **Auto-wires provider & import** (no manual setup)
-- 💬 **Beautiful notification design**
-  - Matches your screenshot style (cyan pill with dark text)
-- ⚙️ **Works with both JSX and TSX**
-- 🧱 **No external dependencies**
-- 🧵 **Same API for all platforms**
-
----
-
-## 📦 Installation
-
-```bash
-npm i nim-react-toastify
-```
-
-## Then run:
-
-```
-npx nim-react-toastify
-```
-
-## Or using yarn / pnpm:
-
-```
-yarn nim-react-toastify
-# or
-pnpm dlx nim-react-toastify
-```
-
-### 🧠 What It Does
-
-When you run npx nim-react-toastify, the CLI:
-
-1. Detects your stack
-
-   If next found → assumes Next.js
-
-   If react-native / expo found → assumes React Native / Expo
-
-   Else → assumes React (Vite/CRA)
-
-2. Finds your root file
-   Checks for:
+## Getting Started
+1. Install the package:
+   ```bash
+   npm install nim-react-toastify
+   # or yarn add nim-react-toastify
    ```
-   app/layout.tsx, app/_layout.tsx, App.tsx, src/App.tsx, index.tsx, etc.
+2. Run the CLI from your project root:
+   ```bash
+   npx nim-react-toastify
    ```
-3. Imports the built-in provider
-   It references the `NotificationsProvider` that ships inside `nim-react-toastify`, so no files are created in your project.
+   It will detect the stack, locate your root (App.tsx, src/App.tsx, app/layout.tsx, etc.), insert the provider import from `nim-react-toastify`, and wrap your root JSX so the toast context is available globally.
 
-4. Injects import & wrapper
-   It adds:
-   ```
-   import { NotificationsProvider } from "nim-react-toastify";
-   ```
-   and wraps your app with:
-   ```
-   <NotificationsProvider> ... </NotificationsProvider>
-   ```
-5. ✅ Done! Your app now has a global notification context.
+## Theme Selection
+`NotificationsProvider` accepts two props:
+- `preset`: one of `default`, `dark`, `light`, `cyan`, `blue`, `purple`, `emerald`, `sunset`, `charcoal`, `coral`. Each preset applies a curated palette to the toast pill, icon, action link, and close control.
+- `theme`: optional overrides for any palette keys (pillBackground, textColor, iconBackground, iconColor, actionColor, closeButtonColor). Custom values merge on top of the selected preset or the default palette.
 
-### 🧩 Usage
-
-After running npx nim-react-toastify, you can immediately use the toast system from anywhere in your app.
-
-### 🎨 Custom Theme
-
-`NotificationsProvider` now exposes preset palettes that you can reference via the `preset` prop plus an optional `theme` override object. Available preset names are `default`, `dark`, `light`, `cyan`, `blue`, `purple`, `emerald`, `sunset`, `charcoal`, and `coral`.
-
-```
+Example:
+```tsx
 import { NotificationsProvider } from "nim-react-toastify";
 
-// quick select
-<NotificationsProvider preset="sunset">...</NotificationsProvider>
-
-// preset + tweaks (action color still cyan)
-<NotificationsProvider
-  preset="dark"
-  theme={{
-    actionColor: "#38BDF8",
-  }}
->
-  ...
+<NotificationsProvider preset="sunset" theme={{ actionColor: "#38BDF8" }}>
+  <App />
 </NotificationsProvider>
 ```
+Use `import { themePresets } from "nim-react-toastify";` if you need to reuse preset objects elsewhere.
 
-If you need the raw palettes, the package also exports `themePresets` so you can reuse them manually:
-
-```
-import { NotificationsProvider, themePresets } from "nim-react-toastify";
-
-<NotificationsProvider theme={themePresets.coral}>...</NotificationsProvider>
-```
-
-## React / Next.js Example
-
-```
+## Runtime API
+Inside any component:
+```tsx
 import { useNotifications } from "nim-react-toastify";
 
-export default function Demo() {
-  const { show } = useNotifications();
-
-  return (
-    <button
-      onClick={() =>
-        show({
-          type: "success",
-          message: "Order placed successfully",
-          actionLabel: "View Order",
-          onActionPress: () => alert("Navigating to Order..."),
-        })
-      }
-    >
-      Place Order
-    </button>
-  );
-}
-```
-
-## React Native / Expo Example
-
-```
-import React from "react";
-import { Button, View } from "react-native";
-import { useNotifications } from "nim-react-toastify";
-
-export default function ExampleScreen() {
-  const { show } = useNotifications();
-
-  return (
-    <View style={{ padding: 24 }}>
-      <Button
-        title="Add to Cart"
-        onPress={() =>
-          show({
-            type: "success",
-            message: "Product added to cart",
-            actionLabel: "View Cart",
-            onActionPress: () => console.log("Navigating to cart..."),
-          })
-        }
-      />
-    </View>
-  );
-}
-```
-
-## 💬 API Reference
-
-    | Option          | Type                             | Default      | Description                                                |
-    | --------------- | -------------------------------- | ------------ | ---------------------------------------------------------- |
-    | `message`       | `string`                         | **required** | The text displayed in the toast                            |
-    | `type`          | `"info" \| "success" \| "error"` | `"info"`     | Controls icon & color                                      |
-    | `actionLabel`   | `string`                         | —            | Optional small button/link text (e.g. “Undo”, “View Cart”) |
-    | `onActionPress` | `() => void`                     | —            | Action executed when button pressed                        |
-    | `duration`      | `number`                         | `3500`       | Duration (ms). Set `0` for persistent                      |
-    | `testID`        | `string`                         | —            | Optional test identifier for E2E/UI tests                  |
-
-## Hook Functions
-
-```
 const { show, hide, clearAll } = useNotifications();
+
+show({
+  type: "success",
+  message: "Order placed!",
+  actionLabel: "View order",
+  onActionPress: () => console.log("Action"),
+});
 ```
 
-## 🎨 Design
+`show` returns an ID that you can pass to `hide` later, and `clearAll` dismisses every active toast.
 
-    Each toast is a pill-shaped cyan bubble with:
+## Publishing / Distribution
+- `package.json` entries expose `main`, `types`, `exports`, and a `react-native` entry so consumers import from `"nim-react-toastify"`.
+- The CLI entry remains `cli.js` under `bin` so `npx nim-react-toastify` works unchanged.
+- GitHub tags (e.g., `v1.0.3`) trigger your CI/CD workflow to publish to npm.
 
-    Left icon (✓, ✕, or i)
-
-    Main message text
-
-    Optional action link (like “Undo”)
-
-    Dismiss ✕ button on right
-
-    Smooth stacking (latest appears on top)
-
-    Type Icon Color
-    info ℹ️ Cyan background
-    success ✓ Cyan background
-    error ✕ Cyan background
-
-    Designed to match your provided screenshot style exactly.
-
-## 🛠️ Generated File Structure
-
-After running npx nim-react-toastify, no project files are created — the provider comes from the npm package and only your root file (App.tsx, layout.tsx, etc.) is touched.
-
-## 🧩 Example Project Integration
-
-# For React (CRA or Vite)
-
-- Root: src/App.tsx
-
-```
-return (
-  <NotificationsProvider>
-    <YourApp />
-  </NotificationsProvider>
-);
-```
-
-## For Next.js (App Router)
-
-- Root: app/layout.tsx
-
-```
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body>
-        <NotificationsProvider>{children}</NotificationsProvider>
-      </body>
-    </html>
-  );
-}
-```
-
-## For React Native / Expo
-
-- Root: App.tsx or app/\_layout.tsx
-
-```
-export default function App() {
-  return (
-    <NotificationsProvider>
-      <StackNavigator />
-    </NotificationsProvider>
-  );
-}
-```
-
-## 🧰 Developer Notes
-
-    Fully ESM (Node 16+)
-
-    No dependencies, no bundler config required
-
-    Safe idempotent injection (runs multiple times without duplication)
-
-    Creates minimal & readable context code
-
-    Designed for instant use without manual wiring
-
-## 🧠 Summary
-
-    | Stack                | Works | Auto-detect | JSX/TSX |
-
-    | -------------------- | ----- | ----------- | ------- |
-    | React (Vite, CRA) | ✅ | ✅ | ✅ |
-    | Next.js (App Router) | ✅ | ✅ | ✅ |
-    | React Native / Expo | ✅ | ✅ | ✅ |
-
-## 📜 License
-
-MIT License
-
-© 2025 NimCloud Systems — Developed by ZaYn Miraj.
+For more details, refer to the full `README.md` in the repository.
