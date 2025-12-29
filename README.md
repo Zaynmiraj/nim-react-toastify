@@ -57,15 +57,15 @@ When you run npx nim-react-toastify, the CLI:
    ```
    app/layout.tsx, app/_layout.tsx, App.tsx, src/App.tsx, index.tsx, etc.
    ```
-3. Creates provider
-   It generates src/nim-react-toastify/NotificationsProvider.tsx with the proper implementation (web or native).
+3. Imports the built-in provider
+   It references the `NotificationsProvider` that ships inside `nim-react-toastify`, so no files are created in your project.
 
 4. Injects import & wrapper
    It adds:
-   ````
-   import { NotificationsProvider } from "./src/nim-react-toastify/NotificationsProvider";```
-   ````
-   ## and wraps your app with:
+   ```
+   import { NotificationsProvider } from "nim-react-toastify";
+   ```
+   and wraps your app with:
    ```
    <NotificationsProvider> ... </NotificationsProvider>
    ```
@@ -75,10 +75,39 @@ When you run npx nim-react-toastify, the CLI:
 
 After running npx nim-react-toastify, you can immediately use the toast system from anywhere in your app.
 
+### 🎨 Custom Theme
+
+`NotificationsProvider` now exposes preset palettes that you can reference via the `preset` prop plus an optional `theme` override object. Available preset names are `default`, `dark`, `light`, `cyan`, `blue`, `purple`, `emerald`, `sunset`, `charcoal`, and `coral`.
+
+```
+import { NotificationsProvider } from "nim-react-toastify";
+
+// quick select
+<NotificationsProvider preset="sunset">...</NotificationsProvider>
+
+// preset + tweaks (action color still cyan)
+<NotificationsProvider
+  preset="dark"
+  theme={{
+    actionColor: "#38BDF8",
+  }}
+>
+  ...
+</NotificationsProvider>
+```
+
+If you need the raw palettes, the package also exports `themePresets` so you can reuse them manually:
+
+```
+import { NotificationsProvider, themePresets } from "nim-react-toastify";
+
+<NotificationsProvider theme={themePresets.coral}>...</NotificationsProvider>
+```
+
 ## React / Next.js Example
 
 ```
-import { useNotifications } from "src/nim-react-toastify/NotificationsProvider";
+import { useNotifications } from "nim-react-toastify";
 
 export default function Demo() {
   const { show } = useNotifications();
@@ -105,7 +134,7 @@ export default function Demo() {
 ```
 import React from "react";
 import { Button, View } from "react-native";
-import { useNotifications } from "src/nim-react-toastify/NotificationsProvider";
+import { useNotifications } from "nim-react-toastify";
 
 export default function ExampleScreen() {
   const { show } = useNotifications();
@@ -168,15 +197,7 @@ const { show, hide, clearAll } = useNotifications();
 
 ## 🛠️ Generated File Structure
 
-After running npx nim-react-toastify, you’ll get:
-
-```
-src/
-└─ nim-react-toastify/
-└─ NotificationsProvider.tsx
-```
-
-Your root file (App.tsx, layout.tsx, etc.) will be automatically wrapped.
+After running npx nim-react-toastify, no project files are created — the provider comes from the npm package and only your root file (App.tsx, layout.tsx, etc.) is touched.
 
 ## 🧩 Example Project Integration
 

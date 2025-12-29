@@ -1,0 +1,86 @@
+const PRESET_THEMES = {
+  default: {
+    pillBackground: "#9AE6F0",
+    textColor: "#0B0F14",
+    iconBackground: "#0B0F14",
+    iconColor: "#9AE6F0",
+    actionColor: "#0B0F14",
+    closeButtonColor: "#0B0F14",
+  },
+  dark: {
+    pillBackground: "#111827",
+    textColor: "#E5E7EB",
+    iconBackground: "#E5E7EB",
+    iconColor: "#0F172A",
+    actionColor: "#60A5FA",
+    closeButtonColor: "#60A5FA",
+  },
+  light: {
+    pillBackground: "#F3F4F6",
+    textColor: "#0F172A",
+    iconBackground: "#0F172A",
+    iconColor: "#FACC15",
+    actionColor: "#2563EB",
+    closeButtonColor: "#2563EB",
+  },
+  cyan: {
+    pillBackground: "#CFFAFE",
+    textColor: "#0F172A",
+    iconBackground: "#0F172A",
+    iconColor: "#06B6D4",
+    actionColor: "#0EA5E9",
+    closeButtonColor: "#0F172A",
+  },
+  blue: {
+    pillBackground: "#E0ECFF",
+    textColor: "#1E3A8A",
+    iconBackground: "#1E3A8A",
+    iconColor: "#E0ECFF",
+    actionColor: "#3B82F6",
+    closeButtonColor: "#1E3A8A",
+  },
+  purple: {
+    pillBackground: "#F5F3FF",
+    textColor: "#4C1D95",
+    iconBackground: "#4C1D95",
+    iconColor: "#F3E8FF",
+    actionColor: "#A855F7",
+    closeButtonColor: "#4C1D95",
+  },
+  emerald: {
+    pillBackground: "#ECFDF5",
+    textColor: "#064E3B",
+    iconBackground: "#064E3B",
+    iconColor: "#6EE7B7",
+    actionColor: "#10B981",
+    closeButtonColor: "#064E3B",
+  },
+  sunset: {
+    pillBackground: "#FEF3C7",
+    textColor: "#92400E",
+    iconBackground: "#92400E",
+    iconColor: "#F97316",
+    actionColor: "#FB923C",
+    closeButtonColor: "#92400E",
+  },
+  charcoal: {
+    pillBackground: "#1F2937",
+    textColor: "#F8FAFC",
+    iconBackground: "#F8FAFC",
+    iconColor: "#1F2937",
+    actionColor: "#38BDF8",
+    closeButtonColor: "#F8FAFC",
+  },
+  coral: {
+    pillBackground: "#FFF1F2",
+    textColor: "#9A3412",
+    iconBackground: "#9A3412",
+    iconColor: "#F87171",
+    actionColor: "#FB923C",
+    closeButtonColor: "#9A3412",
+  },
+};
+
+const DEFAULT_THEME = PRESET_THEMES.default;
+
+export { PRESET_THEMES, DEFAULT_THEME };

@@ -31,6 +31,7 @@ const ERR = (m) => console.error(`\x1b[31m[error]\x1b[0m ${m}`);
 
     const stack = isNext ? "next" : isRN ? "react-native" : "react";
     LOG(`Detected stack: \x1b[1m${stack}\x1b[0m`);
+    const providerName = "NotificationsProvider";
 
     // candidate root files in priority order
     const candidates = [
@@ -66,47 +67,14 @@ const ERR = (m) => console.error(`\x1b[31m[error]\x1b[0m ${m}`);
     }
     LOG(`Root file: ${rel(rootPath)}`);
 
-    const usesTS = /\.tsx?$/.test(rootPath);
-
-    // 1) Ensure a provider template exists in project
-    const targetDir = path.join(cwd, "src", "nim-react-toastify");
-    fs.mkdirSync(targetDir, { recursive: true });
-
-    const providerName = "NotificationsProvider";
-    const providerFile = path.join(
-      targetDir,
-      `${providerName}.${usesTS ? "tsx" : "jsx"}`
-    );
-
-    if (!fs.existsSync(providerFile)) {
-      const template =
-        stack === "react-native"
-          ? readTemplate("templates/provider.rn.tsx")
-          : readTemplate("templates/provider.web.tsx");
-      fs.writeFileSync(providerFile, template, "utf8");
-      LOG(`Created ${rel(providerFile)}`);
-    } else {
-      WARN(
-        `Provider already exists at ${rel(
-          providerFile
-        )} — keeping your version.`
-      );
-    }
-
     // 2) Inject import & wrap root JSX
     let code = fs.readFileSync(rootPath, "utf8");
 
-    const importLine = `import { ${providerName} } from "${posixPath(
-      path.relative(path.dirname(rootPath), providerFile)
-    )
-      .replace(/^\.\./, (m) => m)
-      .replace(/\\/g, "/")
-      .replace(/\.tsx?$/, "")
-      .replace(/\.jsx?$/, "")}";`;
+    const importLine = `import { NotificationsProvider } from "nim-react-toastify";`;
 
     if (
       !code.includes(importLine) &&
-      !code.match(new RegExp(`import\\s*\\{\\s*${providerName}\\s*\\}`))
+      !code.match(/import\s*\{\s*NotificationsProvider\s*\}/)
     ) {
       // insert after first import
       const importBlock = code.match(/(^|\n)import .*;?/g);
@@ -162,15 +130,11 @@ const ERR = (m) => console.error(`\x1b[31m[error]\x1b[0m ${m}`);
     LOG(`Updated ${rel(rootPath)} — provider wired.`);
 
     LOG("Done ✅  Try showing a toast from any component:");
-    if (stack === "react-native") {
-      LOG(`  import { useNotifications } from "${relNoExt(providerFile)}";`);
-      LOG(`  const { show } = useNotifications();`);
-      LOG(`  show({ type: "success", message: "Hello from RN!" });`);
-    } else {
-      LOG(`  import { useNotifications } from "${relNoExt(providerFile)}";`);
-      LOG(`  const { show } = useNotifications();`);
-      LOG(`  show({ type: "success", message: "Hello from Web!" });`);
-    }
+    LOG(`  import { useNotifications } from "nim-react-toastify";`);
+    LOG(`  const { show } = useNotifications();`);
+    LOG(`  show({ type: "success", message: "Hello from ${
+      stack === "react-native" ? "RN" : "Web"
+    }!" });`);
   } catch (e) {
     ERR(e.stack || e.message || String(e));
     process.exit(1);
@@ -184,26 +148,16 @@ function readJSONSafe(p) {
     return null;
   }
 }
-function readTemplate(relPath) {
-  const abs = path.join(__dirname, relPath);
-  return fs.readFileSync(abs, "utf8");
-}
 function rel(p) {
   return path.relative(cwd, p) || ".";
-}
-function relNoExt(p) {
-  return rel(p).replace(/\.(t|j)sx?$/, "");
-}
-function posixPath(p) {
-  return p.split(path.sep).join("/");
 }
 
 /** Try to wrap the first component return(...) with <Provider> */
 function wrapJSXReturn(code, Provider) {
   // Handle `export default function ...` or `function ...` or const ...=()=> return(...)
   // Find the first "return (" that has JSX right after it.
-  const re = /return\s*\(\s*<[^>]/m;
-  const m = code.match(re);
+  const returnRe = /return\s*\(\s*<[^>]/m;
+  const m = code.match(returnRe);
   if (!m) return code;
   const start = m.index + m[0].length - 1; // position at '<'
   let depth = 0,
@@ -227,9 +181,16 @@ function wrapJSXReturn(code, Provider) {
   const inside = code.slice(start, endIdx);
   const after = code.slice(endIdx);
 
-  // avoid double-wrap
-  if (/\<\s*${Provider}\b/.test(inside)) return code;
+  const providerTag = new RegExp(
+    `<\\s*${escapeRegExp(Provider)}\\b`,
+    "i"
+  );
+  if (providerTag.test(inside)) return code;
 
   const wrapped = `<${Provider}>${inside}</${Provider}>`;
   return before + wrapped + after;
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

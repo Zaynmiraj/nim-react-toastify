@@ -1,12 +1,22 @@
 {
   "name": "nim-react-toastify",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "One-command global notification (toast) setup for React, React Native/Expo, and Next.js",
   "bin": {
     "nim-react-toastify": "cli.js"
   },
   "type": "module",
-  "main": "cli.js",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "react-native": "./src/provider.rn.js",
+      "default": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "react-native": "src/provider.rn.js",
   "license": "MIT",
   "keywords": [
     "react",
